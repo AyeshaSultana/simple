@@ -11,6 +11,7 @@
     </head>
     <body class="claro">
 
+    	<div id="loadingOverlay" class="loadingOverlay pageOverlay"><div class="loadingMessage">Loading...</div></div>
 
         <div id="appLayout" class="demoLayout" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'">
             <!--<div class="edgePanel" id="menuItem" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">dd</div> -->
@@ -48,7 +49,8 @@
                         content:"Hello im fine.. thnx"
                     }));
                     aContainer.startup();           
-                    parser.parse();    
+                    parser.parse();
+                    demo.endLoading();
                 },
                 function(Tree, ItemFileReadStore, ForestStoreModel){
                     var store = new ItemFileReadStore({
@@ -68,6 +70,24 @@
                     myTree.startup();
                 }
             );             
+        </script>
+        <script type="text/javascript">
+        	var demo;
+			require(["dojo/_base/declare","dojo/dom","dojo/dom-style"],
+			function(declare, dom, domStyle){
+			    var Demo = declare(null, {
+			        overlayNode:null,
+			        constructor:function(){
+			            // save a reference to the overlay
+			            this.overlayNode = dom.byId("loadingOverlay");
+			        },
+			        // called to hide the loading overlay
+			        endLoading:function(){
+			            domStyle.set(this.overlayNode,'display','none');
+			        }
+			    });
+			    demo = new Demo();
+			});
         </script>
     </body>
 </html>
