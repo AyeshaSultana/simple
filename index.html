@@ -11,26 +11,23 @@
     </head>
 	
     <body class="claro">
-
     	<div id="loadingOverlay" class="loadingOverlay pageOverlay"><div class="loadingMessage">Loading...</div></div>
-
         <div id="appLayout" class="demoLayout" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'">
             <div id="mainMenu"></div>
-            <div id="leftCol"></div>
+            <div id="markup"></div>
+            <div id=""></div>            
         </div>
-        <!-- load dojo and provide config via data attribute -->
-        <!--
-        <script src="dojo/dojo.js"
-                data-dojo-config="async: 1, parseOnLoad: 1">
-        </script>
-    -->
         <script src="//ajax.googleapis.com/ajax/libs/dojo/1.9.2/dojo/dojo.js"></script>
         <script type="text/javascript">
             require([
                 "dijit/layout/BorderContainer","dijit/layout/ContentPane","dijit/layout/TabContainer",
-                "dijit/Menu","dijit/MenuItem","dijit/MenuBar","dijit/MenuBarItem","dijit/PopupMenuBarItem","dojo/domReady!"
+                "dijit/Menu","dijit/MenuItem","dijit/MenuBar","dijit/MenuBarItem","dijit/PopupMenuBarItem",
+                "dijit/layout/AccordionContainer",
+                "dojo/store/Memory", "dijit/tree/ObjectStoreModel", "dijit/Tree",
+                "dijit/form/DateTextBox", "dojo/domReady!"
                 ], function(BorderContainer, ContentPane, TabContainer,
-                        Menu, MenuItem, MenuBar, MenuBarItem, PopupMenuBarItem){
+                        Menu, MenuItem, MenuBar, MenuBarItem, PopupMenuBarItem,
+                        AccordionContainer,Memory, ObjectStoreModel, Tree, DateTextBox){
                     // create the BorderContainer and attach it to our appLayout div
                     var appLayout = new BorderContainer({
                         design: "headline"
@@ -58,77 +55,79 @@
                     taskMenu.startup();
                     demo.endLoading();
 
-                    //Left Content
-
-                    appLayout.addChild(new ContentPane({
-                        region: "left",
-                        id: "leftCol", 
-                        "class" : "edgePanel",
-                        //content: "Left side data",
-                        splitter: true
-                    }));
-
                     // Center Content
-                    var contentTabs = new TabContainer({
-                        region: "center",
-                        id: "contentTabs",
-                        tabPosition: "top",
-                        "class": "centerPanel"
+                    var homeTab = new TabContainer({region: "center", id: "homeTab", tabPosition: "top", "class": "centerPanel"});
+                    homeTab.addChild(new ContentPane({content: "Full page Content", title: "Home"}));
+                    homeTab.addChild(new ContentPane({content: "Split Content", title: "Split"}));
+                    homeTab.addChild(new ContentPane({content: "Graphical Content", title: "Graphical View"}));
+                    appLayout.addChild(homeTab);
+                    
+                    
+                    // Tree
+                    var country = new Memory({
+                        data: [
+                            { id: 'world', name:'The earth', type:'planet', population: '6 billion'},
+                            { id: 'AF', name:'Africa', type:'continent', population:'900 million', area: '30,221,532 sq km', timezone: '-1 UTC to +4 UTC', parent: 'world'},
+                            { id: 'EG', name:'Egypt', type:'country', parent: 'AF' },
+                                { id: 'KE', name:'Kenya', type:'country', parent: 'AF' },
+                                    { id: 'Nairobi', name:'Nairobi', type:'city', parent: 'KE' },
+                                    { id: 'Mombasa', name:'Mombasa', type:'city', parent: 'KE' },
+                                { id: 'SD', name:'Sudan', type:'country', parent: 'AF' },
+                                    { id: 'Khartoum', name:'Khartoum', type:'city', parent: 'SD' },
+                            
+                            
+                            { id: 'AS', name:'Asia', type:'continent', parent: 'world' },
+                                { id: 'CN', name:'China', type:'country', parent: 'AS' },
+                                { id: 'IN', name:'India', type:'country', parent: 'AS' },
+                                { id: 'RU', name:'Russia', type:'country', parent: 'AS' },
+                                { id: 'MN', name:'Mongolia', type:'country', parent: 'AS' },
+                            { id: 'OC', name:'Oceania', type:'continent', population:'21 million', parent: 'world'},
+                            { id: 'EU', name:'Europe', type:'continent', parent: 'world' },
+                                { id: 'DE', name:'Germany', type:'country', parent: 'EU' },
+                                { id: 'FR', name:'France', type:'country', parent: 'EU' },
+                                { id: 'ES', name:'Spain', type:'country', parent: 'EU' },
+                                { id: 'IT', name:'Italy', type:'country', parent: 'EU' },
+                            { id: 'NA', name:'North America', type:'continent', parent: 'world' },
+                            { id: 'SA', name:'South America', type:'continent', parent: 'world' }
+                        ],
+                        getChildren: function(object){
+                            return this.query({parent: object.id});
+                        }
                     });
-                    appLayout.addChild( contentTabs );
-                    contentTabs.addChild(
-                        new ContentPane({
-                            content: "Center Content - ",
-                            title: "Group 1"
-                        })
-                    );
+                    // Create the model
+                    var myModel = new ObjectStoreModel({
+                        store: country,
+                        query: {id: 'world'}
+                    });
+                    // Create the Tree
+                    var tree = new Tree({
+                        model: myModel,
+                        openOnClick:true
+                    });
+
+
+                    // Left Accordian
+                    var leftAccordian = new AccordionContainer({style:"height: 300px; width: 200px;", region: "left", splitter: true}, "markup");
+                    leftAccordian.addChild(new ContentPane({
+                        title: "Tree",
+                        content: tree
+                    }));
+                    leftAccordian.addChild(new ContentPane({
+                        title:"History",
+                        content:"Hi how are you?"
+                    }));
+                    leftAccordian.addChild(new ContentPane({
+                        title:"Data",
+                        content:"Hello im fine.. thnx"
+                    }));                    
+                    leftAccordian.startup();
 
                     // start up and do layout
                     appLayout.startup();
                 }
             );
         </script>
-
-        <script>
-        /*
-            require(["dojo/parser", "dijit/layout/AccordionContainer", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dojo/domReady","dojo/ready",
-                "dijit/Tree", "dojo/data/ItemFileReadStore", "dijit/tree/ForestStoreModel","dojo/request", "dojox/socket"
-                ], function(parser,AccordionContainer, ContentPane, request, TabContainer, ready, Socket){ 
-                    var tabContainer = new TabContainer({
-                        style:  "height: 100%; width: 100%"
-                    }, 'tabContainer');
-                    var devices = new ContentPane({
-                        title: "Devices",
-                        content: "All Devices list"
-                    });
-                    tabContainer.addChild(devices);
-                    var reservations = new ContentPane({
-                        title: "Reservations",
-                        content: "Reservations list"
-                    });
-                    tabContainer.addChild(reservations);
-                    tabContainer.startup();
-
-                    var aContainer = new AccordionContainer({style:"height: 300px"}, "markup");
-                    aContainer.addChild(new ContentPane({
-                        title: "Tree",
-                        content: "Hi!"
-                    }));
-                    aContainer.addChild(new ContentPane({
-                        title:"This is as well",
-                        content:"Hi how are you?"
-                    }));
-                    aContainer.addChild(new ContentPane({
-                        title:"This too",
-                        content:"Hello im fine.. thnx"
-                    }));
-                    
-                    aContainer.startup();                              
-                    parser.parse();
-                    demo.endLoading();
-                }
-            );    */         
-        </script>
+        
         <script type="text/javascript">
         	var demo;
 			require(["dojo/_base/declare","dojo/dom","dojo/dom-style"],
@@ -149,7 +148,4 @@
         </script>
  
     </body>
-    <style type="text/css">
-        #dijitMenuItemLabel {padding-top: 11px;}
-    </style>
 </html>
