@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Demo: Layout with Dijit</title>
+        
+        <link rel="stylesheet" href="css/demo.css" media="screen">
+		<link rel="stylesheet" href="css/style.css" media="screen">
+        <link rel="stylesheet" href="dijit/themes/claro/claro.css" media="screen">
+
+    </head>
+	
+    <body class="claro">
+
+    	<div id="loadingOverlay" class="loadingOverlay pageOverlay"><div class="loadingMessage">Loading...</div></div>
+
+        <div id="appLayout" class="demoLayout" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'">
+            <div id="mainMenu"></div>
+            <div id="leftCol"></div>
+        </div>
+        <!-- load dojo and provide config via data attribute -->
+        <!--
+        <script src="dojo/dojo.js"
+                data-dojo-config="async: 1, parseOnLoad: 1">
+        </script>
+    -->
+        <script src="//ajax.googleapis.com/ajax/libs/dojo/1.9.2/dojo/dojo.js"></script>
+        <script type="text/javascript">
+            require([
+                "dijit/layout/BorderContainer","dijit/layout/ContentPane","dijit/layout/TabContainer",
+                "dijit/Menu","dijit/MenuItem","dijit/MenuBar","dijit/MenuBarItem","dijit/PopupMenuBarItem","dojo/domReady!"
+                ], function(BorderContainer, ContentPane, TabContainer,
+                        Menu, MenuItem, MenuBar, MenuBarItem, PopupMenuBarItem){
+                    // create the BorderContainer and attach it to our appLayout div
+                    var appLayout = new BorderContainer({
+                        design: "headline"
+                    }, "appLayout");
+
+                    // Create Menu Container
+                    var mainMenu = new MenuBar({   
+                        //style: "height: 35px;"
+                        region: "top"                  
+                    }, "mainMenu");
+                    // create Menu container and child MenuItems
+                    // for our sub-menu (no srcNodeRef; we will
+                    //add it under a PopupMenuItem)
+                    var taskMenu = new Menu({id: "taskMenu"});
+                    // adding sub-menu items
+                    taskMenu.addChild(new MenuItem({id: "complete", label: "Complete"}));
+                    taskMenu.addChild(new MenuItem({id: "inprogress", label: "In Complete"}));
+                    taskMenu.addChild(new MenuItem({id: "hole", label: "Hold"}));
+
+                    // create and add main menu items
+                    mainMenu.addChild(new MenuBarItem({id: "file", label: "File"}));
+                    mainMenu.addChild(new MenuBarItem({id: "edit", label: "Edit"}));
+                    mainMenu.addChild(new PopupMenuBarItem({id: "status", label: "Status", popup: taskMenu}));
+                    mainMenu.startup();
+                    taskMenu.startup();
+                    demo.endLoading();
+
+                    //Left Content
+
+                    appLayout.addChild(new ContentPane({
+                        region: "left",
+                        id: "leftCol", 
+                        "class" : "edgePanel",
+                        //content: "Left side data",
+                        splitter: true
+                    }));
+
+                    // Center Content
+                    var contentTabs = new TabContainer({
+                        region: "center",
+                        id: "contentTabs",
+                        tabPosition: "top",
+                        "class": "centerPanel"
+                    });
+                    appLayout.addChild( contentTabs );
+                    contentTabs.addChild(
+                        new ContentPane({
+                            content: "Center Content - ",
+                            title: "Group 1"
+                        })
+                    );
+
+                    // start up and do layout
+                    appLayout.startup();
+                }
+            );
+        </script>
+
+        <script>
+        /*
+            require(["dojo/parser", "dijit/layout/AccordionContainer", "dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dojo/domReady","dojo/ready",
+                "dijit/Tree", "dojo/data/ItemFileReadStore", "dijit/tree/ForestStoreModel","dojo/request", "dojox/socket"
+                ], function(parser,AccordionContainer, ContentPane, request, TabContainer, ready, Socket){ 
+                    var tabContainer = new TabContainer({
+                        style:  "height: 100%; width: 100%"
+                    }, 'tabContainer');
+                    var devices = new ContentPane({
+                        title: "Devices",
+                        content: "All Devices list"
+                    });
+                    tabContainer.addChild(devices);
+                    var reservations = new ContentPane({
+                        title: "Reservations",
+                        content: "Reservations list"
+                    });
+                    tabContainer.addChild(reservations);
+                    tabContainer.startup();
+
+                    var aContainer = new AccordionContainer({style:"height: 300px"}, "markup");
+                    aContainer.addChild(new ContentPane({
+                        title: "Tree",
+                        content: "Hi!"
+                    }));
+                    aContainer.addChild(new ContentPane({
+                        title:"This is as well",
+                        content:"Hi how are you?"
+                    }));
+                    aContainer.addChild(new ContentPane({
+                        title:"This too",
+                        content:"Hello im fine.. thnx"
+                    }));
+                    
+                    aContainer.startup();                              
+                    parser.parse();
+                    demo.endLoading();
+                }
+            );    */         
+        </script>
+        <script type="text/javascript">
+        	var demo;
+			require(["dojo/_base/declare","dojo/dom","dojo/dom-style"],
+			function(declare, dom, domStyle){
+			    var Demo = declare(null, {
+			        overlayNode:null,
+			        constructor:function(){
+			            // save a reference to the overlay
+			            this.overlayNode = dom.byId("loadingOverlay");
+			        },
+			        // called to hide the loading overlay
+			        endLoading:function(){
+			            domStyle.set(this.overlayNode,'display','none');
+			        }
+			    });
+			    demo = new Demo();
+			});
+        </script>
+ 
+    </body>
+    <style type="text/css">
+        #dijitMenuItemLabel {padding-top: 11px;}
+    </style>
+</html>
