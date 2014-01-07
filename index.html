@@ -18,20 +18,58 @@
             <div id=""></div>            
         </div>
         <script src="//ajax.googleapis.com/ajax/libs/dojo/1.9.2/dojo/dojo.js"></script>
+        <!--<script src="dojo/dojo.js"></script> -->
         <script type="text/javascript">
             require([
                 "dijit/layout/BorderContainer","dijit/layout/ContentPane","dijit/layout/TabContainer",
                 "dijit/Menu","dijit/MenuItem","dijit/MenuBar","dijit/MenuBarItem","dijit/PopupMenuBarItem",
                 "dijit/layout/AccordionContainer",
                 "dojo/store/Memory", "dijit/tree/ObjectStoreModel", "dijit/Tree",
-                "dijit/form/DateTextBox", "dojo/domReady!"
+                "dijit/form/DateTextBox","dojox/grid/DataGrid","dojo/data/ObjectStore","dojo/_base/xhr", "dojo/data/ItemFileWriteStore", "dojo/domReady!"
                 ], function(BorderContainer, ContentPane, TabContainer,
                         Menu, MenuItem, MenuBar, MenuBarItem, PopupMenuBarItem,
-                        AccordionContainer,Memory, ObjectStoreModel, Tree, DateTextBox){
+                        AccordionContainer,Memory, ObjectStoreModel, Tree, 
+                        DataGrid, ObjectStore, xhr, ItemFileWriteStore, DateTextBox){
+
+                    
                     // create the BorderContainer and attach it to our appLayout div
                     var appLayout = new BorderContainer({
                         design: "headline"
                     }, "appLayout");
+
+
+                    var grid, store;
+                    store = new ItemFileWriteStore({
+                        url: "hof-batting.json"
+                    });
+                    grid = new DataGrid({
+                        store: store,
+                        query: { id: "*" },
+                        structure: [
+                            { name: "First Name", field: "first", width: "84px",
+                                classes: "firstName" },
+                            { name: "Last Name", field: "last", width: "84px",
+                                cellClasses: "lastName" },
+                            { name: "Bats", field: "bats", width: "70px",
+                                cellStyles: "text-align: right;" },
+                            { name: "Throws", field: "throws", width: "70px" },
+                            { name: "G", field: "totalG", width: "60px" },
+                            { name: "AB", field: "totalAB", width: "60px" },
+                            { name: "Games as Batter", field: "totalGAB", width: "120px",
+                                styles: "text-align: center;" },
+                            { name: "R", field: "totalR", width: "60px" },
+                            { name: "RBI", field: "totalRBI", width: "60px" },
+                            { name: "BB", field: "totalBB", width: "60px" },
+                            { name: "K", field: "totalK", width: "60px" },
+                            { name: "H", field: "totalH", width: "60px" },
+                            { name: "2B", field: "total2B", width: "60px" },
+                            { name: "3B", field: "total3B", width: "60px" },
+                            { name: "HR", field: "totalHR", width: "60px" }
+                        ]
+                    }, "grid");
+                   
+
+
 
                     // Create Menu Container
                     var mainMenu = new MenuBar({   
@@ -55,6 +93,8 @@
                     taskMenu.startup();
                     demo.endLoading();
 
+                    
+
                     // Center Content
                     var homeTab = new TabContainer({region: "center", id: "homeTab", tabPosition: "top", "class": "centerPanel"});
                     homeTab.addChild(new ContentPane({content: "Full page Content", title: "Home"}));
@@ -64,6 +104,7 @@
                     
                     
                     // Tree
+
                     var country = new Memory({
                         data: [
                             { id: 'world', name:'The earth', type:'planet', population: '6 billion'},
